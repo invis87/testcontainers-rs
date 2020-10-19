@@ -1,4 +1,5 @@
 use crate::Docker;
+use std::env::var;
 
 /// Represents a docker network.
 ///
@@ -63,7 +64,14 @@ where
     D: Docker,
 {
     fn drop(&mut self) {
-        self.rm()
+        let keep_container = var("KEEP_CONTAINERS")
+            .ok()
+            .and_then(|var| var.parse().ok())
+            .unwrap_or(false);
+
+        if !keep_container {
+            self.rm()
+        }
     }
 }
 
